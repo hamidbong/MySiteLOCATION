@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+import DAO.SingletonConnection;
 import DAO.UtilisateurDAO;
 
 /**
@@ -66,6 +67,12 @@ public class ServletVerification extends HttpServlet {
             response.sendRedirect("index.jsp");
     	}
     	else {
+        	String dbError = SingletonConnection.getLastError();
+        	if (dbError != null && !dbError.trim().isEmpty()) {
+        		request.setAttribute("errorMessage", "Base de donnees indisponible. Verifiez que MySQL est demarre.");
+        	} else {
+        		request.setAttribute("errorMessage", "Identifiant ou mot de passe invalide.");
+        	}
     		dispatcher = request.getRequestDispatcher("login.jsp");
     		dispatcher.forward(request, response);
     	}

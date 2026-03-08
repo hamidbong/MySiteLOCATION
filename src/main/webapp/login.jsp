@@ -60,6 +60,10 @@
 <body>
     <div class="login-container">
         <h2>Authentification</h2>
+        <% String errorMessage = (String) request.getAttribute("errorMessage"); %>
+        <% if (errorMessage != null) { %>
+            <div style="color: red; margin-bottom: 12px;"><%= errorMessage %></div>
+        <% } %>
         <form id="loginForm" action="ServletVerification" method="post">
             <div class="form-group">
                 <label for="username">ID d'utilisateur :</label>

@@ -106,6 +106,31 @@ src/
    - Navigate to `http://localhost:8080/MySiteLOCATION`
    - Default entry point: Login page
 
+### Quick Deploy (Ubuntu + Tomcat 10)
+
+This repository now includes:
+
+- `scripts/init.sql`: creates database, user, and required tables.
+- `scripts/deploy.sh`: builds WAR, initializes DB, configures Tomcat DB environment, deploys, restarts Tomcat, and checks app availability.
+
+Run:
+
+```bash
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
+```
+
+Optional environment variables:
+
+- `DB_URL` (default: `jdbc:mysql://localhost:3306/locationenligne?serverTimezone=UTC`)
+- `DB_USER` (default: `locationapp`)
+- `DB_PASSWORD` (default: `locationpass`)
+- `TOMCAT_SERVICE` (default: `tomcat10`)
+- `TOMCAT_WEBAPPS_DIR` (default: `/var/lib/tomcat10/webapps`)
+- `APP_NAME` (default: `MySiteLOCATION`)
+- `APP_URL` (default: `http://localhost:8080/MySiteLOCATION/`)
+- `SKIP_DB_INIT=1` to skip SQL initialization
+
 ## Usage
 
 ### For New Users
@@ -183,3 +208,8 @@ For issues or questions, please contact the development team or create an issue 
 **Version:** 1.0  
 **Last Updated:** March 2026
 
+cd /home/brahim/MySiteLOCATION
+./scripts/deploy.sh
+
+2nd option : cd /home/brahim/MySiteLOCATION
+./scripts/deploy.sh

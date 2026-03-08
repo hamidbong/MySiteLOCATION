@@ -5,28 +5,56 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class SingletonConnection {
-	
-	private static Connection connect = null;
-    private static final String url = "jdbc:mysql://localhost:3306/locationenligne?serverTimezone=UTC";
-    private static final String user = "root";
-    private static final String password = "root";
+
+    private static Connection connect = null;
+    private static String lastError = null;
+
+    private static final String DEFAULT_URL = "jdbc:mysql://localhost:3306/locationenligne?serverTimezone=UTC";
+    private static final String DEFAULT_USER = "root";
+    private static final String DEFAULT_PASSWORD = "root";
 
     private SingletonConnection() {
+    }
+
+    private static String config(String envKey, String fallback) {
+        String value = System.getenv(envKey);
+        if (value == null || value.trim().isEmpty()) {
+            return fallback;
+        }
+        return value;
+    }
+
+    private static Connection openConnection() {
+        String url = config("DB_URL", DEFAULT_URL);
+        String user = config("DB_USER", DEFAULT_USER);
+        String password = config("DB_PASSWORD", DEFAULT_PASSWORD);
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            connect = DriverManager.getConnection(url, user, password);
+            lastError = null;
+            return DriverManager.getConnection(url, user, password);
         } catch (SQLException | ClassNotFoundException e) {
+            lastError = e.getMessage();
             e.printStackTrace();
+            return null;
         }
-	}
-	
-	public static Connection getInstance(){
-		if(connect == null) {
-			new SingletonConnection();
-		}
-		return connect;
-		
-	}
-	
+    }
+
+    public static synchronized Connection getInstance() {
+        try {
+            if (connect == null || connect.isClosed()) {
+                connect = openConnection();
+            }
+        } catch (SQLException e) {
+            lastError = e.getMessage();
+            e.printStackTrace();
+            connect = openConnection();
+        }
+        return connect;
+    }
+
+    public static synchronized String getLastError() {
+        return lastError;
+    }
 
 }
