@@ -10,8 +10,6 @@ public class SingletonConnection {
     private static String lastError = null;
 
     private static final String DEFAULT_URL = "jdbc:mysql://localhost:3306/locationenligne?serverTimezone=UTC";
-    private static final String DEFAULT_USER = "root";
-    private static final String DEFAULT_PASSWORD = "root";
 
     private SingletonConnection() {
     }
@@ -24,10 +22,24 @@ public class SingletonConnection {
         return value;
     }
 
+    private static String configRequired(String envKey) {
+        String value = System.getenv(envKey);
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return value;
+    }
+
     private static Connection openConnection() {
         String url = config("DB_URL", DEFAULT_URL);
-        String user = config("DB_USER", DEFAULT_USER);
-        String password = config("DB_PASSWORD", DEFAULT_PASSWORD);
+        String user = configRequired("DB_USER");
+        String password = configRequired("DB_PASSWORD");
+
+        if (user == null || password == null) {
+            lastError = "DB_USER or DB_PASSWORD is missing in environment variables.";
+            System.err.println(lastError);
+            return null;
+        }
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

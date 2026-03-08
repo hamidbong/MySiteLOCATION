@@ -1,0 +1,39 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysite_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${DB_NAME:-locationenligne}
+      MYSQL_USER: ${DB_USER:?set DB_USER in .env}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mysite_app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${DB_NAME:-locationenligne}?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+      DB_USER: ${DB_USER:?set DB_USER in .env}
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

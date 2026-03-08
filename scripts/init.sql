@@ -1,11 +1,3 @@
-CREATE DATABASE IF NOT EXISTS locationenligne CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-CREATE USER IF NOT EXISTS 'locationapp'@'localhost' IDENTIFIED BY 'locationpass';
-GRANT ALL PRIVILEGES ON locationenligne.* TO 'locationapp'@'localhost';
-FLUSH PRIVILEGES;
-
-USE locationenligne;
-
 CREATE TABLE IF NOT EXISTS utilisateur (
   id_utilisateur VARCHAR(64) PRIMARY KEY,
   nom VARCHAR(100) NOT NULL,

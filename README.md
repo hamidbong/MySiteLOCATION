@@ -131,6 +131,51 @@ Optional environment variables:
 - `APP_URL` (default: `http://localhost:8080/MySiteLOCATION/`)
 - `SKIP_DB_INIT=1` to skip SQL initialization
 
+### Run With Docker
+
+You can run the full stack (Tomcat + MySQL) with Docker Compose.
+
+Files added for Docker:
+
+- `Dockerfile`: builds the WAR and runs it on Tomcat 10.
+- `docker-compose.yml`: starts `app` + `mysql` services.
+- `.dockerignore`: excludes build/git/editor files from Docker context.
+
+Start everything:
+
+```bash
+docker compose up --build -d
+```
+
+Watch logs:
+
+```bash
+docker compose logs -f app
+docker compose logs -f mysql
+```
+
+Open application:
+
+- `http://localhost:8080/MySiteLOCATION/`
+
+Stop stack:
+
+```bash
+docker compose down
+```
+
+Reset database volume (fresh start):
+
+```bash
+docker compose down -v
+```
+
+Notes:
+
+- MySQL is exposed on host port `3307`.
+- DB credentials used by default: `locationapp` / `locationpass`.
+- SQL bootstrap is loaded from `scripts/init.sql` on first DB initialization.
+
 ## Usage
 
 ### For New Users
@@ -207,9 +252,3 @@ For issues or questions, please contact the development team or create an issue 
 **Project Name:** MySiteLOCATION  
 **Version:** 1.0  
 **Last Updated:** March 2026
-
-cd /home/brahim/MySiteLOCATION
-./scripts/deploy.sh
-
-2nd option : cd /home/brahim/MySiteLOCATION
-./scripts/deploy.sh
