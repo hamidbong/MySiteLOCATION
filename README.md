@@ -85,6 +85,7 @@ src/
 - Apache Tomcat 9.x or higher
 - MySQL or compatible SQL database
 - Maven (optional, for dependency management)
+- Docker Engine + Docker Compose plugin (for containerized run)
 
 ### Installation
 
@@ -144,36 +145,54 @@ Files added for Docker:
 Start everything:
 
 ```bash
-docker compose up --build -d
+docker-compose up --build -d
+```
+
+Before starting, create and configure `.env` (or adapt existing values):
+
+```dotenv
+DB_NAME=locationenligne
+DB_USER=locationapp
+DB_PASSWORD=change_me_db_password
+MYSQL_ROOT_PASSWORD=change_me_root_password
 ```
 
 Watch logs:
 
 ```bash
-docker compose logs -f app
-docker compose logs -f mysql
+docker-compose logs -f app
+docker-compose logs -f mysql
 ```
 
 Open application:
 
 - `http://localhost:8080/MySiteLOCATION/`
 
+Check container health:
+
+```bash
+docker-compose ps
+docker inspect --format='{{json .State.Health}}' mysite_app
+```
+
 Stop stack:
 
 ```bash
-docker compose down
+docker-compose down
 ```
 
 Reset database volume (fresh start):
 
 ```bash
-docker compose down -v
+docker-compose down -v
 ```
 
 Notes:
 
 - MySQL is exposed on host port `3307`.
-- DB credentials used by default: `locationapp` / `locationpass`.
+- App container runs as non-root user `appuser`.
+- Docker healthcheck probes `http://localhost:8080/MySiteLOCATION/`.
+- DB credentials are loaded from `.env` (`DB_USER`, `DB_PASSWORD`, `DB_NAME`).
 - SQL bootstrap is loaded from `scripts/init.sql` on first DB initialization.
 
 ## Usage
